@@ -17,7 +17,7 @@ namespace OSS.Data.Migrations
                 .HasAnnotation("ProductVersion", "1.1.2")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("AiursoftBase.Models.OSS.Bucket", b =>
+            modelBuilder.Entity("Aiursoft.Pylon.Models.OSS.Bucket", b =>
                 {
                     b.Property<int>("BucketId")
                         .ValueGeneratedOnAdd();
@@ -37,7 +37,7 @@ namespace OSS.Data.Migrations
                     b.ToTable("Bucket");
                 });
 
-            modelBuilder.Entity("AiursoftBase.Models.OSS.OSSApp", b =>
+            modelBuilder.Entity("Aiursoft.Pylon.Models.OSS.OSSApp", b =>
                 {
                     b.Property<string>("AppId")
                         .ValueGeneratedOnAdd();
@@ -47,7 +47,7 @@ namespace OSS.Data.Migrations
                     b.ToTable("Apps");
                 });
 
-            modelBuilder.Entity("AiursoftBase.Models.OSS.OSSFile", b =>
+            modelBuilder.Entity("Aiursoft.Pylon.Models.OSS.OSSFile", b =>
                 {
                     b.Property<int>("FileKey")
                         .ValueGeneratedOnAdd();
@@ -234,16 +234,16 @@ namespace OSS.Data.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("AiursoftBase.Models.OSS.Bucket", b =>
+            modelBuilder.Entity("Aiursoft.Pylon.Models.OSS.Bucket", b =>
                 {
-                    b.HasOne("AiursoftBase.Models.OSS.OSSApp", "BelongingApp")
+                    b.HasOne("Aiursoft.Pylon.Models.OSS.OSSApp", "BelongingApp")
                         .WithMany("MyBuckets")
                         .HasForeignKey("BelongingAppId");
                 });
 
-            modelBuilder.Entity("AiursoftBase.Models.OSS.OSSFile", b =>
+            modelBuilder.Entity("Aiursoft.Pylon.Models.OSS.OSSFile", b =>
                 {
-                    b.HasOne("AiursoftBase.Models.OSS.Bucket", "BelongingBucket")
+                    b.HasOne("Aiursoft.Pylon.Models.OSS.Bucket", "BelongingBucket")
                         .WithMany("Files")
                         .HasForeignKey("BucketId")
                         .OnDelete(DeleteBehavior.Cascade);

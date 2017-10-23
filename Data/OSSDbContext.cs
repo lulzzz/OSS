@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using OSS.Models;
-using AiursoftBase.Models.OSS;
+using Aiursoft.Pylon.Models.OSS;
 
 namespace OSS.Data
 {
