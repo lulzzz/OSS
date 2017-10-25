@@ -11,17 +11,16 @@ namespace Aiursoft.OSS.Services
         public byte[] Compress(string path, string realname)
         {
             var realImagePath = GetCurrentDirectory() + $"{_}Storage{_}_Compressed{_}{realname}";
-            File.Copy(path, realImagePath);
+            File.Copy(path, realImagePath, true);
             var CompressedImagePath = GetCurrentDirectory() + $"{_}Storage{_}_Compressed{_}c_{realname}";
-            GetReducedImage(realImagePath, "", 200, 200);
+            GetReducedImage(realImagePath, CompressedImagePath, 200, 200);
             return System.IO.File.ReadAllBytes(CompressedImagePath);
         }
         public void GetReducedImage(string sourceImage, string saveTarget, int Width, int Height)
         {
             var image = Image.Load(sourceImage);
             image.Mutate(x => x
-                .Resize(200, 200)
-                .Grayscale());
+                .Resize(200, 200));
             image.Save(saveTarget);
         }
     }
