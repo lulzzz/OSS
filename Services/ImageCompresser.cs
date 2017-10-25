@@ -1,14 +1,22 @@
 using System;
-using System.Drawing;
+using SixLabors.ImageSharp;
 
 namespace Aiursoft.OSS.Services
 {
     public class ImageCompresser
     {
-        //public Image GetReducedImage(Image SourceImage,int Width, int Height)
-        //{
-            //Image.Load("");
-            //throw new NotImplementedException();
-        //}
+        public byte[] Compress(string path)
+        {
+            
+        }
+        public void GetReducedImage(string sourceImage, string saveTarget, int Width, int Height)
+        {
+            var image = Image.Load(sourceImage);
+            image.Mutate(x => x
+                .Resize(200, 200)
+                .Grayscale());
+            var targetStream = System.IO.File.Create(saveTarget);
+            image.SaveAsPng(targetStream);
+        }
     }
 }

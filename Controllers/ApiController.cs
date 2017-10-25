@@ -19,6 +19,7 @@ using Aiursoft.Pylon.Models.API.ApiViewModels;
 using Aiursoft.Pylon.Attributes;
 using Aiursoft.Pylon.Models.OSS.ApiAddressModels;
 using Aiursoft.Pylon;
+using Aiursoft.OSS.Services;
 
 namespace Aiursoft.OSS.Controllers
 {
@@ -29,9 +30,13 @@ namespace Aiursoft.OSS.Controllers
     {
         private readonly char _ = Path.DirectorySeparatorChar;
         private readonly OSSDbContext _dbContext;
-        public ApiController(OSSDbContext dbContext)
+        private readonly ImageCompresser _imageCompresser;
+        public ApiController(
+            OSSDbContext dbContext,
+            ImageCompresser imageCompresser)
         {
             this._dbContext = dbContext;
+            this._imageCompresser = imageCompresser;
         }
 
         [Route(template: "/{BucketName}/{FileName}.{FileExtension}")]
@@ -55,7 +60,9 @@ namespace Aiursoft.OSS.Controllers
                 var file = System.IO.File.ReadAllBytes(path);
                 HttpContext.Response.Headers.Add("Content-Length", new FileInfo(path).Length.ToString());
                 HttpContext.Response.Headers.Add("cache-control", "max-age=3600");
-                if (string.IsNullOrWhiteSpace(sd) && MIME.MIMETypesDictionary.ContainsKey(FileExtension.ToLower()))
+                if (string.IsNullOrWhiteSpace(sd) && StringOperation.IsImage(targetFile.RealFileName))
+                    return new FileContentResult(_imageCompresser.Compress(path), MIME.MIMETypesDictionary[FileExtension.ToLower()]);
+                else if (string.IsNullOrWhiteSpace(sd) && MIME.MIMETypesDictionary.ContainsKey(FileExtension.ToLower()))
                     return new FileContentResult(file, MIME.MIMETypesDictionary[FileExtension.ToLower()]);
                 else
                     return new FileContentResult(file, "application/octet-stream");

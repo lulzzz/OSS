@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Aiursoft.OSS.Data;
 using Aiursoft.OSS.Models;
+using Aiursoft.OSS.Services;
 using Aiursoft.Pylon;
 using Aiursoft.Pylon.Services;
 using Microsoft.AspNetCore.Identity;
@@ -41,6 +42,7 @@ namespace Aiursoft.OSS
                 .AddDefaultTokenProviders();
 
             services.AddMvc();
+            services.AddTransient<ImageCompresser>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, OSSDbContext dbContext)
