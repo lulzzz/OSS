@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace OSS.Data.Migrations
+namespace Aiursoft.OSS.Data.Migrations
 {
     public partial class migrate : Migration
     {

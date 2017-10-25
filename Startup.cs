@@ -9,14 +9,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using OSS.Data;
-using OSS.Models;
-using OSS.Services;
+using Aiursoft.OSS.Data;
+using Aiursoft.OSS.Models;
+using Aiursoft.OSS.Services;
 using Aiursoft.Pylon;
 using Aiursoft.Pylon.Services;
 using Microsoft.AspNetCore.Identity;
 
-namespace OSS
+namespace Aiursoft.OSS
 {
     public class Startup
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
-namespace OSS
+namespace Aiursoft.OSS
 {
     public class Program
     {

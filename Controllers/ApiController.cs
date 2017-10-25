@@ -7,8 +7,8 @@ using static System.IO.Directory;
 using Microsoft.AspNetCore.Mvc;
 using Aiursoft.Pylon.Services;
 using Aiursoft.Pylon.Services.ToAPIServer;
-using OSS.Data;
-using OSS.Models;
+using Aiursoft.OSS.Data;
+using Aiursoft.OSS.Models;
 using Aiursoft.Pylon.Models;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
@@ -20,7 +20,7 @@ using Aiursoft.Pylon.Attributes;
 using Aiursoft.Pylon.Models.OSS.ApiAddressModels;
 using Aiursoft.Pylon;
 
-namespace OSS.Controllers
+namespace Aiursoft.OSS.Controllers
 {
     [AiurExceptionHandler]
     [ForceValidateModelState]

@@ -7,7 +7,7 @@ using Aiursoft.Pylon;
 using Aiursoft.Pylon.Attributes;
 using Aiursoft.Pylon.Models;
 
-namespace OSS.Controllers
+namespace Aiursoft.OSS.Controllers
 {
     [AiurExceptionHandler]
     [AiurRequireHttps]

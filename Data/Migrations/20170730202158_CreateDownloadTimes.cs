@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace OSS.Data.Migrations
+namespace Aiursoft.OSS.Data.Migrations
 {
     public partial class CreateDownloadTimes : Migration
     {

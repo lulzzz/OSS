@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
-using OSS.Data;
+using Aiursoft.OSS.Data;
 
-namespace OSS.Data.Migrations
+namespace Aiursoft.OSS.Data.Migrations
 {
     [DbContext(typeof(OSSDbContext))]
     [Migration("20170730202158_CreateDownloadTimes")]

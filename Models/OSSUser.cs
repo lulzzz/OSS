@@ -8,7 +8,7 @@ using Aiursoft.Pylon.Models;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 
-namespace OSS.Models
+namespace Aiursoft.OSS.Models
 {
     public class OSSUser : AiurUserBase
     {

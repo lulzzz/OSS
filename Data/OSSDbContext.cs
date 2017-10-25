@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using OSS.Models;
+using Aiursoft.OSS.Models;
 using Aiursoft.Pylon.Models.OSS;
 
-namespace OSS.Data
+namespace Aiursoft.OSS.Data
 {
     public class OSSDbContext : IdentityDbContext<OSSUser>
     {
