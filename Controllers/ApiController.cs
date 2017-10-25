@@ -61,7 +61,7 @@ namespace Aiursoft.OSS.Controllers
                 HttpContext.Response.Headers.Add("Content-Length", new FileInfo(path).Length.ToString());
                 HttpContext.Response.Headers.Add("cache-control", "max-age=3600");
                 if (string.IsNullOrWhiteSpace(sd) && StringOperation.IsImage(targetFile.RealFileName))
-                    return new FileContentResult(_imageCompresser.Compress(path), MIME.MIMETypesDictionary[FileExtension.ToLower()]);
+                    return new FileContentResult(_imageCompresser.Compress(path, targetFile.RealFileName), MIME.MIMETypesDictionary[FileExtension.ToLower()]);
                 else if (string.IsNullOrWhiteSpace(sd) && MIME.MIMETypesDictionary.ContainsKey(FileExtension.ToLower()))
                     return new FileContentResult(file, MIME.MIMETypesDictionary[FileExtension.ToLower()]);
                 else
