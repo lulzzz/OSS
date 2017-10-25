@@ -40,7 +40,7 @@ namespace Aiursoft.OSS.Controllers
         }
 
         [Route(template: "/{BucketName}/{FileName}.{FileExtension}")]
-        public async Task<IActionResult> DownloadFile(string BucketName, string FileName, string FileExtension, string sd = "")
+        public async Task<IActionResult> DownloadFile(string BucketName, string FileName, string FileExtension, string sd = "", int w = -1, int h = -1)
         {
             var targetBucket = await _dbContext.Bucket.SingleOrDefaultAsync(t => t.BucketName == BucketName);
             var targetFile = await _dbContext
@@ -52,20 +52,32 @@ namespace Aiursoft.OSS.Controllers
                 return NotFound();
             if (targetFile.BucketId != targetBucket.BucketId)
                 return Unauthorized();
+                
+            // Update download times
             targetFile.DownloadTimes++;
             await _dbContext.SaveChangesAsync();
+
             var path = GetCurrentDirectory() + $"{_}Storage{_}{targetBucket.BucketName}{_}{targetFile.FileKey}.dat";
             try
             {
                 var file = System.IO.File.ReadAllBytes(path);
                 HttpContext.Response.Headers.Add("Content-Length", new FileInfo(path).Length.ToString());
                 HttpContext.Response.Headers.Add("cache-control", "max-age=3600");
-                if (string.IsNullOrWhiteSpace(sd) && StringOperation.IsImage(targetFile.RealFileName))
-                    return new FileContentResult(_imageCompresser.Compress(path, targetFile.RealFileName), MIME.MIMETypesDictionary[FileExtension.ToLower()]);
-                else if (string.IsNullOrWhiteSpace(sd) && MIME.MIMETypesDictionary.ContainsKey(FileExtension.ToLower()))
-                    return new FileContentResult(file, MIME.MIMETypesDictionary[FileExtension.ToLower()]);
-                else
+                // Direct download marked or unknown type
+                if (!string.IsNullOrWhiteSpace(sd) || !MIME.MIMETypesDictionary.ContainsKey(FileExtension.ToLower()))
+                {
                     return new FileContentResult(file, "application/octet-stream");
+                }
+                // Is image and compress required
+                else if (StringOperation.IsImage(targetFile.RealFileName) && h > 0 && w > 0)
+                {
+                    return new FileContentResult(_imageCompresser.Compress(path, targetFile.RealFileName,w,h), MIME.MIMETypesDictionary[FileExtension.ToLower()]);
+                }
+                // Is known type
+                else
+                {
+                    return new FileContentResult(file, MIME.MIMETypesDictionary[FileExtension.ToLower()]);
+                }
             }
             catch (Exception e) when (e is DirectoryNotFoundException || e is FileNotFoundException)
             {

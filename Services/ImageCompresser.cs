@@ -8,19 +8,26 @@ namespace Aiursoft.OSS.Services
     public class ImageCompresser
     {
         private readonly char _ = Path.DirectorySeparatorChar;
-        public byte[] Compress(string path, string realname)
+        public byte[] Compress(string path, string realname, int width, int height)
         {
-            var realImagePath = GetCurrentDirectory() + $"{_}Storage{_}_Compressed{_}{realname}";
+            var CompressedFolder = GetCurrentDirectory() + $"{_}Storage{_}_Compressed{_}";
+            if (Exists(CompressedFolder) == false)
+            {
+                CreateDirectory(CompressedFolder);
+            }
+
+            var realImagePath = CompressedFolder + realname;
             File.Copy(path, realImagePath, true);
-            var CompressedImagePath = GetCurrentDirectory() + $"{_}Storage{_}_Compressed{_}c_{realname}";
-            GetReducedImage(realImagePath, CompressedImagePath, 200, 200);
+            
+            var CompressedImagePath = $"{CompressedFolder}c_{realname}";
+            GetReducedImage(realImagePath, CompressedImagePath, width, height);
             return System.IO.File.ReadAllBytes(CompressedImagePath);
         }
-        public void GetReducedImage(string sourceImage, string saveTarget, int Width, int Height)
+        public void GetReducedImage(string sourceImage, string saveTarget, int width, int height)
         {
             var image = Image.Load(sourceImage);
             image.Mutate(x => x
-                .Resize(200, 200));
+                .Resize(width, height));
             image.Save(saveTarget);
         }
     }
