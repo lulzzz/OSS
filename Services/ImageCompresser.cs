@@ -11,9 +11,13 @@ namespace Aiursoft.OSS.Services
         public byte[] Compress(string path, string realname, int width, int height)
         {
             var CompressedFolder = GetCurrentDirectory() + $"{_}Compressed{_}";
+            if (Exists(CompressedFolder) == false)
+            {
+                CreateDirectory(CompressedFolder);
+            }
             var CompressedImagePath = $"{CompressedFolder}c_w{width}h{height}{realname}";
             GetReducedImage(path, CompressedImagePath, width, height);
-            return System.IO.File.ReadAllBytes(CompressedImagePath);
+            return File.ReadAllBytes(CompressedImagePath);
         }
         public void GetReducedImage(string sourceImage, string saveTarget, int width, int height)
         {
