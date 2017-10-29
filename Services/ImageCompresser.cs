@@ -19,7 +19,7 @@ namespace Aiursoft.OSS.Services
             var realImagePath = CompressedFolder + realname;
             File.Copy(path, realImagePath, true);
             
-            var CompressedImagePath = $"{CompressedFolder}c_{realname}";
+            var CompressedImagePath = $"{CompressedFolder}c_w{width}h{height}{realname}";
             GetReducedImage(realImagePath, CompressedImagePath, width, height);
             return System.IO.File.ReadAllBytes(CompressedImagePath);
         }
