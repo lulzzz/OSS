@@ -1,4 +1,5 @@
 ﻿using Aiursoft.OSS.Data;
+using Aiursoft.OSS.Models.DownloadAddressModels;
 using Aiursoft.OSS.Services;
 using Aiursoft.Pylon;
 using Aiursoft.Pylon.Attributes;
@@ -31,13 +32,13 @@ namespace Aiursoft.OSS.Controllers
             this._imageCompresser = imageCompresser;
         }
         [Route(template: "/{BucketName}/{FileName}.{FileExtension}")]
-        public async Task<IActionResult> DownloadFile(string BucketName, string FileName, string FileExtension, string sd = "", [Range(-2, 10000)]int w = -1, [Range(-2, 10000)]int h = -1)
+        public async Task<IActionResult> DownloadFile(DownloadFileAddressModel model)
         {
-            var targetBucket = await _dbContext.Bucket.SingleOrDefaultAsync(t => t.BucketName == BucketName);
+            var targetBucket = await _dbContext.Bucket.SingleOrDefaultAsync(t => t.BucketName == model.BucketName);
             var targetFile = await _dbContext
                 .OSSFile
                 .Where(t => t.BucketId == targetBucket.BucketId)
-                .SingleOrDefaultAsync(t => t.RealFileName == FileName + "." + FileExtension);
+                .SingleOrDefaultAsync(t => t.RealFileName == model.FileName + "." + model.FileExtension);
 
             if (targetBucket == null || targetFile == null)
                 return NotFound();
@@ -55,19 +56,19 @@ namespace Aiursoft.OSS.Controllers
                 HttpContext.Response.Headers.Add("Content-Length", new FileInfo(path).Length.ToString());
                 HttpContext.Response.Headers.Add("cache-control", "max-age=3600");
                 // Direct download marked or unknown type
-                if (!string.IsNullOrWhiteSpace(sd) || !MIME.MIMETypesDictionary.ContainsKey(FileExtension.ToLower()))
+                if (!string.IsNullOrWhiteSpace(model.sd) || !MIME.MIMETypesDictionary.ContainsKey(model.FileExtension.ToLower()))
                 {
                     return new FileContentResult(file, "application/octet-stream");
                 }
                 // Is image and compress required
-                else if (StringOperation.IsImage(targetFile.RealFileName) && h > 0 && w > 0)
+                else if (StringOperation.IsImage(targetFile.RealFileName) && model.h > 0 && model.w > 0)
                 {
-                    return new FileContentResult(_imageCompresser.Compress(path, targetFile.RealFileName, w, h), MIME.MIMETypesDictionary[FileExtension.ToLower()]);
+                    return new FileContentResult(_imageCompresser.Compress(path, targetFile.RealFileName, model.w, model.h), MIME.MIMETypesDictionary[model.FileExtension.ToLower()]);
                 }
                 // Is known type
                 else
                 {
-                    return new FileContentResult(file, MIME.MIMETypesDictionary[FileExtension.ToLower()]);
+                    return new FileContentResult(file, MIME.MIMETypesDictionary[model.FileExtension.ToLower()]);
                 }
             }
             catch (Exception e) when (e is DirectoryNotFoundException || e is FileNotFoundException)
