@@ -242,7 +242,7 @@ namespace Aiursoft.OSS.Controllers
                 BucketId = targetBucket.BucketId,
             };
             // Ensure there not exists file with the same file name.
-            var exists = _dbContext.OSSFile.Exists(t => t.RealFileName == newFile.RealFileName);
+            var exists = _dbContext.OSSFile.Exists(t => t.RealFileName == newFile.RealFileName && t.BucketId == newFile.BucketId);
             if (exists)
             {
                 return Protocal(ErrorType.HasDoneAlready, "There already exists a file with that name.");
