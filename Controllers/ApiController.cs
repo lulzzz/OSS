@@ -235,19 +235,19 @@ namespace Aiursoft.OSS.Controllers
             {
                 return Protocal(ErrorType.InvalidInput, "Please upload your file!");
             }
-            // Ensure there not exists file with the same file name.
-            var exists = _dbContext.OSSFile.Exists(t => t.RealFileName.ToLower() == file.FileName.ToLower());
-            if (exists)
-            {
-                return Protocal(ErrorType.HasDoneAlready, "There already exists a file with that name.");
-            }
-            //Save to database
             var newFile = new OSSFile
             {
                 RealFileName = Path.GetFileName(file.FileName.Replace(" ", "")),
                 FileExtension = Path.GetExtension(file.FileName),
                 BucketId = targetBucket.BucketId,
             };
+            // Ensure there not exists file with the same file name.
+            var exists = _dbContext.OSSFile.Exists(t => t.RealFileName == newFile.RealFileName);
+            if (exists)
+            {
+                return Protocal(ErrorType.HasDoneAlready, "There already exists a file with that name.");
+            }
+            //Save to database
             _dbContext.OSSFile.Add(newFile);
             await _dbContext.SaveChangesAsync();
             //Try saving file.
