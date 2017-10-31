@@ -45,7 +45,7 @@ namespace Aiursoft.OSS.Controllers
             var app = await ApiService.ValidateAccessTokenAsync(model.AccessToken);
             if (app.AppId != model.AppId)
             {
-                return Json(new AiurProtocal { code = ErrorType.Unauthorized, message = "The app you try to delete is not the accesstoken you granted!" });
+                return Protocal(ErrorType.Unauthorized, "The app you try to delete is not the accesstoken you granted!");
             }
 
             var target = await _dbContext.Apps.FindAsync(app.AppId);
@@ -55,9 +55,9 @@ namespace Aiursoft.OSS.Controllers
                 _dbContext.Bucket.Delete(t => t.BelongingAppId == target.AppId);
                 _dbContext.Apps.Remove(target);
                 await _dbContext.SaveChangesAsync();
-                return Json(new AiurProtocal { code = ErrorType.Success, message = "Successfully deleted that app and all files." });
+                return Protocal(ErrorType.Success, "Successfully deleted that app and all files.");
             }
-            return Json(new AiurProtocal { code = ErrorType.HasDoneAlready, message = "That app do not exists in our database." });
+            return Protocal(ErrorType.HasDoneAlready, "That app do not exists in our database.");
         }
 
         public async Task<JsonResult> ViewMyBuckets(ViewMyBucketsAddressModel model)
@@ -110,11 +110,7 @@ namespace Aiursoft.OSS.Controllers
             var existing = await _dbContext.Bucket.SingleOrDefaultAsync(t => t.BucketName == model.BucketName);
             if (existing != null)
             {
-                return Json(new AiurProtocal
-                {
-                    code = ErrorType.NotEnoughResources,
-                    message = "There is one bucket already called that name!"
-                });
+                return Protocal(ErrorType.NotEnoughResources, "There is one bucket already called that name!");
             }
             //Create and save to database
             var newBucket = new Bucket
@@ -146,23 +142,19 @@ namespace Aiursoft.OSS.Controllers
         public async Task<JsonResult> EditBucket([FromForm]EditBucketAddressModel model)
         {
             var app = await ApiService.ValidateAccessTokenAsync(model.AccessToken);
-            var existing = await _dbContext.Bucket.SingleOrDefaultAsync(t => t.BucketName == model.NewBucketName && t.BucketId != model.BucketId);
-            if (existing != null)
+            var existing = _dbContext.Bucket.Exists(t => t.BucketName == model.NewBucketName && t.BucketId != model.BucketId);
+            if (existing)
             {
-                return Json(new AiurProtocal
-                {
-                    code = ErrorType.NotEnoughResources,
-                    message = "There is one bucket already called that name!"
-                });
+                return Protocal(ErrorType.NotEnoughResources, "There is one bucket already called that name!");
             }
             var target = await _dbContext.Bucket.FindAsync(model.BucketId);
             if (target == null)
             {
-                return Json(new AiurProtocal { code = ErrorType.NotFound, message = "Not found bucket!" });
+                return Protocal(ErrorType.NotFound, "Not found target bucket!");
             }
             else if (target.BelongingAppId != app.AppId)
             {
-                return Json(new AiurProtocal { code = ErrorType.Unauthorized, message = "Not your bucket!" });
+                return Protocal(ErrorType.Unauthorized, "This is not your bucket!");
             }
             var oldpath = GetCurrentDirectory() + $@"{_}Storage{_}{target.BucketName}";
             var newpath = GetCurrentDirectory() + $@"{_}Storage{_}{model.NewBucketName}";
@@ -174,7 +166,7 @@ namespace Aiursoft.OSS.Controllers
             target.OpenToRead = model.OpenToRead;
             target.OpenToUpload = model.OpenToUpload;
             await _dbContext.SaveChangesAsync();
-            return Json(new AiurProtocal { code = ErrorType.Success, message = "Successfully edited your bucket!" });
+            return Protocal(ErrorType.Success, "Successfully edited your bucket!");
         }
 
         public async Task<JsonResult> ViewBucketDetail(ViewBucketDetailAddressModel model)
@@ -182,7 +174,7 @@ namespace Aiursoft.OSS.Controllers
             var targetBucket = await _dbContext.Bucket.FindAsync(model.BucketId);
             if (targetBucket == null)
             {
-                return Json(new AiurProtocal { code = ErrorType.NotFound, message = "Can not find your bucket!" });
+                return Protocal(ErrorType.NotFound, "Can not find target bucket!");
             }
             var viewModel = new ViewBucketViewModel(targetBucket)
             {
@@ -200,12 +192,12 @@ namespace Aiursoft.OSS.Controllers
             var bucket = await _dbContext.Bucket.FindAsync(model.BucketId);
             if (bucket.BelongingAppId != app.AppId)
             {
-                return Json(new AiurProtocal { code = ErrorType.Unauthorized, message = "The bucket you try to delete is not your app's bucket!" });
+                return Protocal(ErrorType.Unauthorized, "The bucket you try to delete is not your app's bucket!");
             }
             _dbContext.Bucket.Remove(bucket);
             _dbContext.OSSFile.RemoveRange(_dbContext.OSSFile.Where(t => t.BucketId == bucket.BucketId));
             await _dbContext.SaveChangesAsync();
-            return Json(new AiurProtocal { code = ErrorType.Success, message = "Successfully deleted your bucket!" });
+            return Protocal(ErrorType.Success, "Successfully deleted your bucket!");
         }
 
         public async Task<JsonResult> ViewOneFile(ViewOneFileAddressModel model)
@@ -235,32 +227,20 @@ namespace Aiursoft.OSS.Controllers
             var targetBucket = await _dbContext.Bucket.FindAsync(model.BucketId);
             if (targetBucket == null || targetBucket.BelongingAppId != app.AppId)
             {
-                return Json(new AiurProtocal
-                {
-                    code = ErrorType.Unauthorized,
-                    message = "The bucket you try to upload is not your app's bucket!"
-                });
+                return Protocal(ErrorType.Unauthorized,"The bucket you try to upload is not your app's bucket!");
             }
             //try get the file from form
             var file = Request.Form.Files.First();
             if (file == null)
             {
-                return Json(new AiurProtocal
-                {
-                    code = ErrorType.InvalidInput,
-                    message = "Please upload your file!"
-                });
+                return Protocal(ErrorType.InvalidInput, "Please upload your file!");
             }
-            //Test the extension
-            //bool validExtension = MIME.MIMETypesDictionary.ContainsKey(Path.GetExtension(file.FileName).Replace(".", "").ToLower());
-            //if (!validExtension)
-            //{
-            //    return Json(new AiurProtocal
-            //    {
-            //        code = ErrorType.InvalidInput,
-            //        message = "The extension of your file is not supported!"
-            //    });
-            //}
+            // Ensure there not exists file with the same file name.
+            var exists = _dbContext.OSSFile.Exists(t => t.RealFileName.ToLower() == file.FileName.ToLower());
+            if (exists)
+            {
+                return Protocal(ErrorType.HasDoneAlready, "There already exists a file with that name.");
+            }
             //Save to database
             var newFile = new OSSFile
             {
@@ -297,11 +277,7 @@ namespace Aiursoft.OSS.Controllers
             //Security
             if (bucket.BelongingAppId != app.AppId)
             {
-                return Json(new AiurProtocal
-                {
-                    code = ErrorType.Unauthorized,
-                    message = "The bucket you tried to view is not that app's bucket."
-                });
+                return Protocal(ErrorType.Unauthorized, "The bucket you tried to view is not that app's bucket.");
             }
             //Get all files.
             var allFiles = _dbContext.OSSFile.Include(t => t.BelongingBucket).Where(t => t.BucketId == bucket.BucketId).Take(200);
@@ -329,24 +305,16 @@ namespace Aiursoft.OSS.Controllers
             var file = await _dbContext.OSSFile.FindAsync(model.FileKey);
             if (bucket == null || file == null)
             {
-                return Json(new AiurProtocal { code = ErrorType.NotFound, message = "We did not find that file in that bucket!" });
+                return Protocal(ErrorType.NotFound,  "We did not find that file in that bucket!");
             }
             //Security
             if (bucket.BelongingAppId != app.AppId)
             {
-                return Json(new AiurProtocal
-                {
-                    code = ErrorType.Unauthorized,
-                    message = "The bucket you tried is not that app's bucket."
-                });
+                return Protocal(ErrorType.Unauthorized,  "The bucket you tried is not that app's bucket.");
             }
             if (file.BucketId != bucket.BucketId)
             {
-                return Json(new AiurProtocal
-                {
-                    code = ErrorType.Unauthorized,
-                    message = "The file and the bucket are both found but it is not in that bucket."
-                });
+                return Protocal(ErrorType.Unauthorized, "The file and the bucket are both found but it is not in that bucket.");
             }
             //Delete file in disk
             var path = GetCurrentDirectory() + $@"{_}Storage{_}{bucket.BucketName}{_}{file.FileKey}.dat";
@@ -354,20 +322,7 @@ namespace Aiursoft.OSS.Controllers
             //Delete file in database
             _dbContext.OSSFile.Remove(file);
             await _dbContext.SaveChangesAsync();
-            return Json(new AiurProtocal
-            {
-                code = ErrorType.Success,
-                message = "Successfully deleted your file!"
-            });
-        }
-
-        private JsonResult _InvalidInput(string Message)
-        {
-            return Json(new AiurProtocal
-            {
-                code = ErrorType.InvalidInput,
-                message = Message
-            });
+            return Protocal(ErrorType.Success, "Successfully deleted your file!");
         }
     }
 }
