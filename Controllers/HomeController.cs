@@ -22,6 +22,11 @@ namespace Aiursoft.OSS.Controllers
             });
         }
 
+        public IActionResult Test()
+        {
+            return View();
+        }
+
         public IActionResult Error()
         {
             return View();

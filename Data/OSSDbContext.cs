@@ -9,7 +9,7 @@ using Aiursoft.Pylon.Models.OSS;
 
 namespace Aiursoft.OSS.Data
 {
-    public class OSSDbContext : IdentityDbContext<OSSUser>
+    public class OSSDbContext : DbContext
     {
         public DbSet<Bucket> Bucket { get; set; }
         public DbSet<OSSFile> OSSFile { get; set; }
