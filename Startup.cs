@@ -54,7 +54,6 @@ namespace Aiursoft.OSS
             }
 
             app.UseStaticFiles();
-            app.UseAiursoftAuthentication("6da19556352c16d8f87056c6f9cee746", "2cc99eb8d8be181244cb9c780b83ef2d");
             app.UseMvcWithDefaultRoute();
         }
     }
