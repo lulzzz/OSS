@@ -31,6 +31,7 @@ namespace Aiursoft.OSS.Controllers
             this._dbContext = dbContext;
             this._imageCompresser = imageCompresser;
         }
+
         [Route(template: "/{BucketName}/{FileName}.{FileExtension}")]
         public async Task<IActionResult> DownloadFile(DownloadFileAddressModel model)
         {
@@ -40,7 +41,7 @@ namespace Aiursoft.OSS.Controllers
                 .Where(t => t.BucketId == targetBucket.BucketId)
                 .SingleOrDefaultAsync(t => t.RealFileName == model.FileName + "." + model.FileExtension);
 
-            if (targetBucket == null || targetFile == null)
+            if (targetBucket == null || targetFile == null || !targetBucket.OpenToRead)
                 return NotFound();
             if (targetFile.BucketId != targetBucket.BucketId)
                 return Unauthorized();
@@ -69,6 +70,48 @@ namespace Aiursoft.OSS.Controllers
                 else
                 {
                     return new FileContentResult(file, MIME.MIMETypesDictionary[model.FileExtension.ToLower()]);
+                }
+            }
+            catch (Exception e) when (e is DirectoryNotFoundException || e is FileNotFoundException)
+            {
+                return NotFound();
+            }
+        }
+
+        public async Task<IActionResult> FromSecret(FromSecretAddressModel model)
+        {
+            var secret = await _dbContext
+                .Secrets
+                .Include(t=>t.File)
+                .SingleOrDefaultAsync(t => t.Value == model.sec);
+            if (secret == null)
+            {
+                return NotFound();
+            }
+            var bucket = await _dbContext
+                .Bucket
+                .SingleOrDefaultAsync(t=>t.BucketId == secret.File.BucketId);
+
+            var path = GetCurrentDirectory() + $"{_}Storage{_}{bucket.BucketName}{_}{secret.File.FileKey}.dat";
+            try
+            {
+                var file = System.IO.File.ReadAllBytes(path);
+                HttpContext.Response.Headers.Add("Content-Length", new FileInfo(path).Length.ToString());
+                HttpContext.Response.Headers.Add("cache-control", "max-age=3600");
+                // Direct download marked or unknown type
+                if (!string.IsNullOrWhiteSpace(model.sd) || !MIME.MIMETypesDictionary.ContainsKey(secret.File.FileExtension.ToLower()))
+                {
+                    return new FileContentResult(file, "application/octet-stream");
+                }
+                // Is image and compress required
+                else if (StringOperation.IsImage(secret.File.RealFileName) && model.h > 0 && model.w > 0)
+                {
+                    return new FileContentResult(_imageCompresser.Compress(path, secret.File.RealFileName, model.w, model.h), MIME.MIMETypesDictionary[secret.File.FileExtension.ToLower()]);
+                }
+                // Is known type
+                else
+                {
+                    return new FileContentResult(file, MIME.MIMETypesDictionary[secret.File.FileExtension.ToLower()]);
                 }
             }
             catch (Exception e) when (e is DirectoryNotFoundException || e is FileNotFoundException)
