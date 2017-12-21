@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using Aiursoft.Pylon.Services;
 using Aiursoft.Pylon.Models;
 using Aiursoft.Pylon.Attributes;
+using Aiursoft.Pylon.Models.OSS;
+using Aiursoft.Pylon.Models.OSS.SecretAddressModels;
 
 namespace Aiursoft.OSS.Controllers
 {
@@ -27,11 +29,11 @@ namespace Aiursoft.OSS.Controllers
 
         [HttpGet]
         [ForceValidateModelState]
-        public async Task<IActionResult> Generate(int id, string accessToken)
+        public async Task<IActionResult> Generate(GenerateAddressModel model)
         {
-            var app = await ApiService.ValidateAccessTokenAsync(accessToken);
+            var app = await ApiService.ValidateAccessTokenAsync(model.AccessToken);
             var appLocal = await _dbContext.Apps.SingleOrDefaultAsync(t => t.AppId == app.AppId);
-            var file = await _dbContext.OSSFile.Include(t => t.BelongingBucket).SingleOrDefaultAsync(t => t.FileKey == id);
+            var file = await _dbContext.OSSFile.Include(t => t.BelongingBucket).SingleOrDefaultAsync(t => t.FileKey == model.Id);
             if (file == null || file.BelongingBucket.BelongingAppId != appLocal.AppId)
             {
                 return NotFound();
