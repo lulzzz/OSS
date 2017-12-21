@@ -16,8 +16,8 @@ namespace Aiursoft.OSS.Models
         [ForeignKey(nameof(FileId))]
         public OSSFile File { get; set; }
 
-        public bool Used { get; set; }
-        public string UseTime { get; set; }
-        public string UserIpAddress { get; set; }
+        public bool Used { get; set; } = false;
+        public DateTime UseTime { get; set; } = DateTime.MinValue;
+        public string UserIpAddress { get; set; } = string.Empty;
     }
 }
