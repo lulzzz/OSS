@@ -82,9 +82,9 @@ namespace Aiursoft.OSS.Controllers
         {
             var secret = await _dbContext
                 .Secrets
-                .Include(t=>t.File)
+                .Include(t => t.File)
                 .SingleOrDefaultAsync(t => t.Value == model.sec);
-            if (secret == null)
+            if (secret == null || secret.Used)
             {
                 return NotFound();
             }
@@ -94,7 +94,7 @@ namespace Aiursoft.OSS.Controllers
             await _dbContext.SaveChangesAsync();
             var bucket = await _dbContext
                 .Bucket
-                .SingleOrDefaultAsync(t=>t.BucketId == secret.File.BucketId);
+                .SingleOrDefaultAsync(t => t.BucketId == secret.File.BucketId);
 
             var path = GetCurrentDirectory() + $"{_}Storage{_}{bucket.BucketName}{_}{secret.File.FileKey}.dat";
             try
@@ -103,19 +103,19 @@ namespace Aiursoft.OSS.Controllers
                 HttpContext.Response.Headers.Add("Content-Length", new FileInfo(path).Length.ToString());
                 HttpContext.Response.Headers.Add("cache-control", "max-age=3600");
                 // Direct download marked or unknown type
-                if (!string.IsNullOrWhiteSpace(model.sd) || !MIME.MIMETypesDictionary.ContainsKey(secret.File.FileExtension.ToLower()))
+                if (!string.IsNullOrWhiteSpace(model.sd) || !MIME.MIMETypesDictionary.ContainsKey(secret.File.FileExtension.Trim('.').ToLower()))
                 {
                     return new FileContentResult(file, "application/octet-stream");
                 }
                 // Is image and compress required
                 else if (StringOperation.IsImage(secret.File.RealFileName) && model.h > 0 && model.w > 0)
                 {
-                    return new FileContentResult(_imageCompresser.Compress(path, secret.File.RealFileName, model.w, model.h), MIME.MIMETypesDictionary[secret.File.FileExtension.ToLower()]);
+                    return new FileContentResult(_imageCompresser.Compress(path, secret.File.RealFileName, model.w, model.h), MIME.MIMETypesDictionary[secret.File.FileExtension.Trim('.').ToLower()]);
                 }
                 // Is known type
                 else
                 {
-                    return new FileContentResult(file, MIME.MIMETypesDictionary[secret.File.FileExtension.ToLower()]);
+                    return new FileContentResult(file, MIME.MIMETypesDictionary[secret.File.FileExtension.Trim('.').ToLower()]);
                 }
             }
             catch (Exception e) when (e is DirectoryNotFoundException || e is FileNotFoundException)
