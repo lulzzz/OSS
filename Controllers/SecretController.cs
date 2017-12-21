@@ -39,7 +39,12 @@ namespace Aiursoft.OSS.Controllers
                 FileId = file.FileKey
             };
             _dbContext.Secrets.Add(newSecret);
-            return Protocal(ErrorType.Success, newSecret.Value);
+            await _dbContext.SaveChangesAsync();
+            return Json(new AiurValue<string>(newSecret.Value)
+            {
+                code =ErrorType.Success,
+                message = "Successfully created your onetime secret!"
+            });
         }
     }
 }
