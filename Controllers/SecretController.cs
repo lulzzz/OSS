@@ -26,6 +26,7 @@ namespace Aiursoft.OSS.Controllers
         }
 
         [HttpGet]
+        [ForceValidateModelState]
         public async Task<IActionResult> Generate(int id, string accessToken)
         {
             var app = await ApiService.ValidateAccessTokenAsync(accessToken);
@@ -45,7 +46,7 @@ namespace Aiursoft.OSS.Controllers
             await _dbContext.SaveChangesAsync();
             return Json(new AiurValue<string>(newSecret.Value)
             {
-                code =ErrorType.Success,
+                code = ErrorType.Success,
                 message = "Successfully created your onetime secret!"
             });
         }

@@ -32,6 +32,7 @@ namespace Aiursoft.OSS.Controllers
             this._imageCompresser = imageCompresser;
         }
 
+        [HttpGet]
         [Route(template: "/{BucketName}/{FileName}.{FileExtension}")]
         public async Task<IActionResult> DownloadFile(DownloadFileAddressModel model)
         {
@@ -78,6 +79,7 @@ namespace Aiursoft.OSS.Controllers
             }
         }
 
+        [HttpGet]
         public async Task<IActionResult> FromSecret(FromSecretAddressModel model)
         {
             var secret = await _dbContext
