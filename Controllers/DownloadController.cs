@@ -88,6 +88,10 @@ namespace Aiursoft.OSS.Controllers
             {
                 return NotFound();
             }
+            secret.Used = true;
+            secret.UseTime = DateTime.Now;
+            secret.UserIpAddress = HttpContext.Connection.RemoteIpAddress.ToString();
+            await _dbContext.SaveChangesAsync();
             var bucket = await _dbContext
                 .Bucket
                 .SingleOrDefaultAsync(t=>t.BucketId == secret.File.BucketId);
