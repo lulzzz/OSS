@@ -10,9 +10,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Aiursoft.Pylon.Services;
 using Aiursoft.Pylon.Models;
+using Aiursoft.Pylon.Attributes;
 
 namespace Aiursoft.OSS.Controllers
 {
+    [AiurRequireHttps]
+    [AiurExceptionHandler]
     public class SecretController : AiurController
     {
         private readonly OSSDbContext _dbContext;
