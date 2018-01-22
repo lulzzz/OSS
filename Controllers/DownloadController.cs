@@ -65,12 +65,13 @@ namespace Aiursoft.OSS.Controllers
                 // Is image and compress required
                 else if (StringOperation.IsImage(targetFile.RealFileName) && model.h > 0 && model.w > 0)
                 {
-                    return File(_imageCompresser.Compress(path, targetFile.RealFileName, model.w, model.h), MIME.MIMETypesDictionary[model.FileExtension.ToLower()], targetFile.RealFileName);
+                    return File(_imageCompresser.Compress(path, targetFile.RealFileName, model.w, model.h), 
+                        MIME.MIMETypesDictionary[model.FileExtension.ToLower()]);
                 }
                 // Is known type
                 else
                 {
-                    return File(fileStream, MIME.MIMETypesDictionary[model.FileExtension.ToLower()], targetFile.RealFileName);
+                    return File(fileStream, MIME.MIMETypesDictionary[model.FileExtension.ToLower()]);
                 }
             }
             catch (Exception e) when (e is DirectoryNotFoundException || e is FileNotFoundException)
@@ -112,12 +113,12 @@ namespace Aiursoft.OSS.Controllers
                 // Is image and compress required
                 else if (StringOperation.IsImage(secret.File.RealFileName) && model.h > 0 && model.w > 0)
                 {
-                    return File(_imageCompresser.Compress(path, secret.File.RealFileName, model.w, model.h), MIME.MIMETypesDictionary[secret.File.FileExtension.Trim('.').ToLower()], secret.File.RealFileName);
+                    return File(_imageCompresser.Compress(path, secret.File.RealFileName, model.w, model.h), MIME.MIMETypesDictionary[secret.File.FileExtension.Trim('.').ToLower()]);
                 }
                 // Is known type
                 else
                 {
-                    return File(fileStream, MIME.MIMETypesDictionary[secret.File.FileExtension.Trim('.').ToLower()], secret.File.RealFileName);
+                    return File(fileStream, MIME.MIMETypesDictionary[secret.File.FileExtension.Trim('.').ToLower()]);
                 }
             }
             catch (Exception e) when (e is DirectoryNotFoundException || e is FileNotFoundException)
