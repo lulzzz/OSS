@@ -54,23 +54,23 @@ namespace Aiursoft.OSS.Controllers
             var path = GetCurrentDirectory() + $"{_}Storage{_}{targetBucket.BucketName}{_}{targetFile.FileKey}.dat";
             try
             {
-                var file = System.IO.File.ReadAllBytes(path);
+                var fileStream = System.IO.File.OpenRead(path);
                 HttpContext.Response.Headers.Add("Content-Length", new FileInfo(path).Length.ToString());
                 HttpContext.Response.Headers.Add("cache-control", "max-age=3600");
                 // Direct download marked or unknown type
                 if (!string.IsNullOrWhiteSpace(model.sd) || !MIME.MIMETypesDictionary.ContainsKey(model.FileExtension.ToLower()))
                 {
-                    return new FileContentResult(file, "application/octet-stream");
+                    return File(fileStream, "application/octet-stream", targetFile.RealFileName);
                 }
                 // Is image and compress required
                 else if (StringOperation.IsImage(targetFile.RealFileName) && model.h > 0 && model.w > 0)
                 {
-                    return new FileContentResult(_imageCompresser.Compress(path, targetFile.RealFileName, model.w, model.h), MIME.MIMETypesDictionary[model.FileExtension.ToLower()]);
+                    return File(_imageCompresser.Compress(path, targetFile.RealFileName, model.w, model.h), MIME.MIMETypesDictionary[model.FileExtension.ToLower()], targetFile.RealFileName);
                 }
                 // Is known type
                 else
                 {
-                    return new FileContentResult(file, MIME.MIMETypesDictionary[model.FileExtension.ToLower()]);
+                    return File(fileStream, MIME.MIMETypesDictionary[model.FileExtension.ToLower()], targetFile.RealFileName);
                 }
             }
             catch (Exception e) when (e is DirectoryNotFoundException || e is FileNotFoundException)
@@ -101,23 +101,23 @@ namespace Aiursoft.OSS.Controllers
             var path = GetCurrentDirectory() + $"{_}Storage{_}{bucket.BucketName}{_}{secret.File.FileKey}.dat";
             try
             {
-                var file = System.IO.File.ReadAllBytes(path);
+                var fileStream = System.IO.File.OpenRead(path);
                 HttpContext.Response.Headers.Add("Content-Length", new FileInfo(path).Length.ToString());
                 HttpContext.Response.Headers.Add("cache-control", "max-age=3600");
                 // Direct download marked or unknown type
                 if (!string.IsNullOrWhiteSpace(model.sd) || !MIME.MIMETypesDictionary.ContainsKey(secret.File.FileExtension.Trim('.').ToLower()))
                 {
-                    return new FileContentResult(file, "application/octet-stream");
+                    return File(fileStream, "application/octet-stream", secret.File.RealFileName);
                 }
                 // Is image and compress required
                 else if (StringOperation.IsImage(secret.File.RealFileName) && model.h > 0 && model.w > 0)
                 {
-                    return new FileContentResult(_imageCompresser.Compress(path, secret.File.RealFileName, model.w, model.h), MIME.MIMETypesDictionary[secret.File.FileExtension.Trim('.').ToLower()]);
+                    return File(_imageCompresser.Compress(path, secret.File.RealFileName, model.w, model.h), MIME.MIMETypesDictionary[secret.File.FileExtension.Trim('.').ToLower()], secret.File.RealFileName);
                 }
                 // Is known type
                 else
                 {
-                    return new FileContentResult(file, MIME.MIMETypesDictionary[secret.File.FileExtension.Trim('.').ToLower()]);
+                    return File(fileStream, MIME.MIMETypesDictionary[secret.File.FileExtension.Trim('.').ToLower()], secret.File.RealFileName);
                 }
             }
             catch (Exception e) when (e is DirectoryNotFoundException || e is FileNotFoundException)
