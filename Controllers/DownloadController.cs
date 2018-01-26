@@ -52,9 +52,9 @@ namespace Aiursoft.OSS.Controllers
             await _dbContext.SaveChangesAsync();
 
             var path = GetCurrentDirectory() + $"{_}Storage{_}{targetBucket.BucketName}{_}{targetFile.FileKey}.dat";
+            var fileStream = System.IO.File.OpenRead(path);
             try
             {
-                var fileStream = System.IO.File.OpenRead(path);
                 HttpContext.Response.Headers.Add("Content-Length", new FileInfo(path).Length.ToString());
                 HttpContext.Response.Headers.Add("cache-control", "max-age=3600");
                 // Direct download marked or unknown type
@@ -76,6 +76,7 @@ namespace Aiursoft.OSS.Controllers
             }
             catch (Exception e) when (e is DirectoryNotFoundException || e is FileNotFoundException)
             {
+                fileStream.Close();
                 return NotFound();
             }
         }
