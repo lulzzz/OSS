@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2002
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aiursoft.OSS", "Aiursoft.OSS.csproj", "{4AE9899C-4F5A-419C-824B-8F2BCE178571}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aiursoft.OSS", ".\src\Aiursoft.OSS.csproj", "{4AE9899C-4F5A-419C-824B-8F2BCE178571}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -15,6 +15,7 @@ using Aiursoft.OSS.Services;
 using Aiursoft.Pylon;
 using Aiursoft.Pylon.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace Aiursoft.OSS
 {
@@ -35,7 +36,10 @@ namespace Aiursoft.OSS
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.ConnectToAiursoftDatabase<OSSDbContext>("OSS",IsDevelopment);
+            services.AddDbContext<OSSDbContext>(options =>
+                options.UseMySql(Configuration.GetConnectionString("DatabaseConnection")));
+
+            //services.ConnectToAiursoftDatabase<OSSDbContext>("OSS",IsDevelopment);
 
             services.AddMvc();
             services.AddTransient<ImageCompresser>();
@@ -43,6 +47,10 @@ namespace Aiursoft.OSS
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, OSSDbContext dbContext)
         {
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

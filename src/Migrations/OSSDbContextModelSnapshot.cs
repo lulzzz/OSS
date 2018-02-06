@@ -8,18 +8,17 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
 using System;
 
-namespace Aiursoft.OSS.Data.Migrations
+namespace Aiursoft.OSS.Migrations
 {
     [DbContext(typeof(OSSDbContext))]
-    [Migration("20171031110022_RemoveUserInfo")]
-    partial class RemoveUserInfo
+    partial class OSSDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.0.0-rtm-26452")
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn)
+                .HasAnnotation("ProductVersion", "2.0.1-rtm-125");
 
             modelBuilder.Entity("Aiursoft.Pylon.Models.OSS.Bucket", b =>
                 {
@@ -71,6 +70,28 @@ namespace Aiursoft.OSS.Data.Migrations
                     b.ToTable("OSSFile");
                 });
 
+            modelBuilder.Entity("Aiursoft.Pylon.Models.OSS.Secret", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("FileId");
+
+                    b.Property<DateTime>("UseTime");
+
+                    b.Property<bool>("Used");
+
+                    b.Property<string>("UserIpAddress");
+
+                    b.Property<string>("Value");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FileId");
+
+                    b.ToTable("Secrets");
+                });
+
             modelBuilder.Entity("Aiursoft.Pylon.Models.OSS.Bucket", b =>
                 {
                     b.HasOne("Aiursoft.Pylon.Models.OSS.OSSApp", "BelongingApp")
@@ -83,6 +104,14 @@ namespace Aiursoft.OSS.Data.Migrations
                     b.HasOne("Aiursoft.Pylon.Models.OSS.Bucket", "BelongingBucket")
                         .WithMany("Files")
                         .HasForeignKey("BucketId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Aiursoft.Pylon.Models.OSS.Secret", b =>
+                {
+                    b.HasOne("Aiursoft.Pylon.Models.OSS.OSSFile", "File")
+                        .WithMany("Secrets")
+                        .HasForeignKey("FileId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
