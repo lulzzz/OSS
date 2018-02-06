@@ -14,6 +14,7 @@ namespace Aiursoft.OSS
         {
             var host = WebHost.CreateDefaultBuilder(args)
                  .UseStartup<Startup>()
+                 .UseUrls("http://*:5002")
                  .Build();
 
             return host;
