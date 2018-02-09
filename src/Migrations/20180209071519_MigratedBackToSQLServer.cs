@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Aiursoft.OSS.Migrations
 {
-    public partial class MigratedToMySQL : Migration
+    public partial class MigratedBackToSQLServer : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -25,7 +25,7 @@ namespace Aiursoft.OSS.Migrations
                 columns: table => new
                 {
                     BucketId = table.Column<int>(nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     BelongingAppId = table.Column<string>(nullable: true),
                     BucketName = table.Column<string>(nullable: true),
                     OpenToRead = table.Column<bool>(nullable: false),
@@ -47,7 +47,7 @@ namespace Aiursoft.OSS.Migrations
                 columns: table => new
                 {
                     FileKey = table.Column<int>(nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     BucketId = table.Column<int>(nullable: false),
                     DownloadTimes = table.Column<int>(nullable: false),
                     FileExtension = table.Column<string>(nullable: true),
@@ -69,7 +69,7 @@ namespace Aiursoft.OSS.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     FileId = table.Column<int>(nullable: false),
                     UseTime = table.Column<DateTime>(nullable: false),
                     Used = table.Column<bool>(nullable: false),

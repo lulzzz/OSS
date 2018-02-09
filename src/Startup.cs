@@ -37,7 +37,7 @@ namespace Aiursoft.OSS
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<OSSDbContext>(options =>
-                options.UseMySql(Configuration.GetConnectionString("DatabaseConnection")));
+                options.UseSqlServer(Configuration.GetConnectionString("DatabaseConnection")));
 
             //services.ConnectToAiursoftDatabase<OSSDbContext>("OSS",IsDevelopment);
 
@@ -47,10 +47,6 @@ namespace Aiursoft.OSS
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, OSSDbContext dbContext)
         {
-            app.UseForwardedHeaders(new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            });
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

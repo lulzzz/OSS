@@ -11,15 +11,15 @@ using System;
 namespace Aiursoft.OSS.Migrations
 {
     [DbContext(typeof(OSSDbContext))]
-    [Migration("20180206025132_MigratedToMySQL")]
-    partial class MigratedToMySQL
+    [Migration("20180209071519_MigratedBackToSQLServer")]
+    partial class MigratedBackToSQLServer
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn)
-                .HasAnnotation("ProductVersion", "2.0.1-rtm-125");
+                .HasAnnotation("ProductVersion", "2.0.1-rtm-125")
+                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Aiursoft.Pylon.Models.OSS.Bucket", b =>
                 {
