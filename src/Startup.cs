@@ -23,6 +23,7 @@ namespace Aiursoft.OSS
     {
         public IConfiguration Configuration { get; }
         public bool IsDevelopment { get; set; }
+        public static string StoragePath { get; set; }
 
         public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
@@ -39,14 +40,17 @@ namespace Aiursoft.OSS
             services.AddDbContext<OSSDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DatabaseConnection")));
 
-            //services.ConnectToAiursoftDatabase<OSSDbContext>("OSS",IsDevelopment);
-
             services.AddMvc();
             services.AddTransient<ImageCompresser>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, OSSDbContext dbContext)
         {
+            StoragePath = Configuration[nameof(StoragePath)];
+            if(string.IsNullOrWhiteSpace(StoragePath))
+            {
+                throw new InvalidOperationException("Did not find a valid storage path!");
+            }
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

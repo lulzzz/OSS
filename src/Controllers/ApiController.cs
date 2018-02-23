@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.IO;
-using static System.IO.Directory;
 using Microsoft.AspNetCore.Mvc;
 using Aiursoft.Pylon.Services;
 using Aiursoft.Pylon.Services.ToAPIServer;
@@ -123,7 +122,7 @@ namespace Aiursoft.OSS.Controllers
             appLocal.MyBuckets.Add(newBucket);
             await _dbContext.SaveChangesAsync();
             //Create an empty folder
-            string DirectoryPath = GetCurrentDirectory() + $@"{_}Storage{_}{newBucket.BucketName}{_}";
+            string DirectoryPath = Startup.StoragePath + $@"{_}Storage{_}{newBucket.BucketName}{_}";
             if (Directory.Exists(DirectoryPath) == false)
             {
                 Directory.CreateDirectory(DirectoryPath);
@@ -156,8 +155,8 @@ namespace Aiursoft.OSS.Controllers
             {
                 return Protocal(ErrorType.Unauthorized, "This is not your bucket!");
             }
-            var oldpath = GetCurrentDirectory() + $@"{_}Storage{_}{target.BucketName}";
-            var newpath = GetCurrentDirectory() + $@"{_}Storage{_}{model.NewBucketName}";
+            var oldpath = Startup.StoragePath + $@"{_}Storage{_}{target.BucketName}";
+            var newpath = Startup.StoragePath + $@"{_}Storage{_}{model.NewBucketName}";
             if (oldpath != newpath)
             {
                 new DirectoryInfo(oldpath).MoveTo(newpath);
@@ -207,7 +206,7 @@ namespace Aiursoft.OSS.Controllers
                 .Include(t => t.BelongingBucket)
                 .SingleOrDefaultAsync(t => t.FileKey == model.FileKey);
 
-            var path = GetCurrentDirectory() + $@"{_}Storage{_}{file.BelongingBucket.BucketName}{_}{file.FileKey}.dat";
+            var path = Startup.StoragePath + $@"{_}Storage{_}{file.BelongingBucket.BucketName}{_}{file.FileKey}.dat";
             file.JFileSize = new FileInfo(path).Length;
 
             var viewModel = new ViewOneFileViewModel
@@ -251,10 +250,10 @@ namespace Aiursoft.OSS.Controllers
             _dbContext.OSSFile.Add(newFile);
             await _dbContext.SaveChangesAsync();
             //Try saving file.
-            string DirectoryPath = GetCurrentDirectory() + $"{_}Storage{_}{targetBucket.BucketName}{_}";
-            if (Exists(DirectoryPath) == false)
+            string DirectoryPath = Startup.StoragePath + $"{_}Storage{_}{targetBucket.BucketName}{_}";
+            if (Directory.Exists(DirectoryPath) == false)
             {
-                CreateDirectory(DirectoryPath);
+                Directory.CreateDirectory(DirectoryPath);
             }
             var fileStream = new FileStream(DirectoryPath + newFile.FileKey + ".dat", FileMode.Create);
             await file.CopyToAsync(fileStream);
@@ -283,7 +282,7 @@ namespace Aiursoft.OSS.Controllers
             var allFiles = _dbContext.OSSFile.Include(t => t.BelongingBucket).Where(t => t.BucketId == bucket.BucketId).Take(200);
             foreach (var file in allFiles)
             {
-                var path = GetCurrentDirectory() + $@"{_}Storage{_}{file.BelongingBucket.BucketName}{_}{file.FileKey}.dat";
+                var path = Startup.StoragePath + $@"{_}Storage{_}{file.BelongingBucket.BucketName}{_}{file.FileKey}.dat";
                 file.JFileSize = new FileInfo(path).Length;
             }
             var viewModel = new ViewAllFilesViewModel
@@ -317,7 +316,7 @@ namespace Aiursoft.OSS.Controllers
                 return Protocal(ErrorType.Unauthorized, "The file and the bucket are both found but it is not in that bucket.");
             }
             //Delete file in disk
-            var path = GetCurrentDirectory() + $@"{_}Storage{_}{bucket.BucketName}{_}{file.FileKey}.dat";
+            var path = Startup.StoragePath + $@"{_}Storage{_}{bucket.BucketName}{_}{file.FileKey}.dat";
             System.IO.File.Delete(path);
             //Delete file in database
             _dbContext.OSSFile.Remove(file);

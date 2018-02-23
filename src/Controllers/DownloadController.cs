@@ -13,7 +13,6 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using static System.IO.Directory;
 
 namespace Aiursoft.OSS.Controllers
 {
@@ -51,7 +50,7 @@ namespace Aiursoft.OSS.Controllers
             targetFile.DownloadTimes++;
             await _dbContext.SaveChangesAsync();
 
-            var path = GetCurrentDirectory() + $"{_}Storage{_}{targetBucket.BucketName}{_}{targetFile.FileKey}.dat";
+            var path = Startup.StoragePath + $"{_}Storage{_}{targetBucket.BucketName}{_}{targetFile.FileKey}.dat";
             var fileStream = System.IO.File.OpenRead(path);
             try
             {
@@ -100,7 +99,7 @@ namespace Aiursoft.OSS.Controllers
                 .Bucket
                 .SingleOrDefaultAsync(t => t.BucketId == secret.File.BucketId);
 
-            var path = GetCurrentDirectory() + $"{_}Storage{_}{bucket.BucketName}{_}{secret.File.FileKey}.dat";
+            var path = Startup.StoragePath + $"{_}Storage{_}{bucket.BucketName}{_}{secret.File.FileKey}.dat";
             try
             {
                 var fileStream = System.IO.File.OpenRead(path);

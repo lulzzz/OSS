@@ -1,7 +1,6 @@
 using System;
 using SixLabors.ImageSharp;
 using System.IO;
-using static System.IO.Directory;
 
 namespace Aiursoft.OSS.Services
 {
@@ -10,10 +9,10 @@ namespace Aiursoft.OSS.Services
         private readonly char _ = Path.DirectorySeparatorChar;
         public FileStream Compress(string path, string realname, int width, int height)
         {
-            var CompressedFolder = GetCurrentDirectory() + $"{_}Compressed{_}";
-            if (Exists(CompressedFolder) == false)
+            var CompressedFolder = Startup.StoragePath + $"{_}Compressed{_}";
+            if (Directory.Exists(CompressedFolder) == false)
             {
-                CreateDirectory(CompressedFolder);
+                Directory.CreateDirectory(CompressedFolder);
             }
             var CompressedImagePath = $"{CompressedFolder}c_w{width}h{height}{realname}";
             GetReducedImage(path, CompressedImagePath, width, height);
