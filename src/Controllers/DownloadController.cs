@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
+using Microsoft.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace Aiursoft.OSS.Controllers
@@ -35,6 +36,7 @@ namespace Aiursoft.OSS.Controllers
         [Route(template: "/{BucketName}/{FileName}.{FileExtension}")]
         public async Task<IActionResult> DownloadFile(DownloadFileAddressModel model)
         {
+            var download = !string.IsNullOrWhiteSpace(model.sd);
             var targetBucket = await _dbContext.Bucket.SingleOrDefaultAsync(t => t.BucketName == model.BucketName);
             var targetFile = await _dbContext
                 .OSSFile
@@ -43,39 +45,25 @@ namespace Aiursoft.OSS.Controllers
 
             if (targetBucket == null || targetFile == null || !targetBucket.OpenToRead)
                 return NotFound();
-            if (targetFile.BucketId != targetBucket.BucketId)
-                return Unauthorized();
-
             // Update download times
             targetFile.DownloadTimes++;
             await _dbContext.SaveChangesAsync();
 
             var path = Startup.StoragePath + $"{_}Storage{_}{targetBucket.BucketName}{_}{targetFile.FileKey}.dat";
-            var fileStream = System.IO.File.OpenRead(path);
             try
             {
                 HttpContext.Response.Headers.Add("Content-Length", new FileInfo(path).Length.ToString());
-                HttpContext.Response.Headers.Add("cache-control", "max-age=3600");
-                // Direct download marked or unknown type
-                if (!string.IsNullOrWhiteSpace(model.sd) || !MIME.MIMETypesDictionary.ContainsKey(model.FileExtension.ToLower()))
+                if (StringOperation.IsImage(targetFile.RealFileName) && model.h > 0 && model.w > 0)
                 {
-                    return File(fileStream, "application/octet-stream", targetFile.RealFileName);
+                    return await this.AiurFile(await _imageCompresser.Compress(path, targetFile.RealFileName, model.w, model.h), targetFile.RealFileName);
                 }
-                // Is image and compress required
-                else if (StringOperation.IsImage(targetFile.RealFileName) && model.h > 0 && model.w > 0)
-                {
-                    return File(_imageCompresser.Compress(path, targetFile.RealFileName, model.w, model.h), 
-                        MIME.MIMETypesDictionary[model.FileExtension.ToLower()]);
-                }
-                // Is known type
                 else
                 {
-                    return File(fileStream, MIME.MIMETypesDictionary[model.FileExtension.ToLower()]);
+                    return await this.AiurFile(path, targetFile.RealFileName, download);
                 }
             }
             catch (Exception e) when (e is DirectoryNotFoundException || e is FileNotFoundException)
             {
-                fileStream.Close();
                 return NotFound();
             }
         }
@@ -83,6 +71,7 @@ namespace Aiursoft.OSS.Controllers
         [HttpGet]
         public async Task<IActionResult> FromSecret(FromSecretAddressModel model)
         {
+            var download = !string.IsNullOrWhiteSpace(model.sd);
             var secret = await _dbContext
                 .Secrets
                 .Include(t => t.File)
@@ -102,23 +91,14 @@ namespace Aiursoft.OSS.Controllers
             var path = Startup.StoragePath + $"{_}Storage{_}{bucket.BucketName}{_}{secret.File.FileKey}.dat";
             try
             {
-                var fileStream = System.IO.File.OpenRead(path);
                 HttpContext.Response.Headers.Add("Content-Length", new FileInfo(path).Length.ToString());
-                HttpContext.Response.Headers.Add("cache-control", "max-age=3600");
-                // Direct download marked or unknown type
-                if (!string.IsNullOrWhiteSpace(model.sd) || !MIME.MIMETypesDictionary.ContainsKey(secret.File.FileExtension.Trim('.').ToLower()))
+                if (StringOperation.IsImage(secret.File.RealFileName) && model.h > 0 && model.w > 0)
                 {
-                    return File(fileStream, "application/octet-stream", secret.File.RealFileName);
+                    return await this.AiurFile(await _imageCompresser.Compress(path, secret.File.RealFileName, model.w, model.h), secret.File.RealFileName);
                 }
-                // Is image and compress required
-                else if (StringOperation.IsImage(secret.File.RealFileName) && model.h > 0 && model.w > 0)
-                {
-                    return File(_imageCompresser.Compress(path, secret.File.RealFileName, model.w, model.h), MIME.MIMETypesDictionary[secret.File.FileExtension.Trim('.').ToLower()]);
-                }
-                // Is known type
                 else
                 {
-                    return File(fileStream, MIME.MIMETypesDictionary[secret.File.FileExtension.Trim('.').ToLower()]);
+                    return await this.AiurFile(path, secret.File.RealFileName, download);
                 }
             }
             catch (Exception e) when (e is DirectoryNotFoundException || e is FileNotFoundException)

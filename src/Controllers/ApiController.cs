@@ -255,9 +255,11 @@ namespace Aiursoft.OSS.Controllers
             {
                 Directory.CreateDirectory(DirectoryPath);
             }
-            var fileStream = new FileStream(DirectoryPath + newFile.FileKey + ".dat", FileMode.Create);
-            await file.CopyToAsync(fileStream);
-            fileStream.Close();
+            using (var fileStream = new FileStream(DirectoryPath + newFile.FileKey + ".dat", FileMode.Create))
+            {
+                await file.CopyToAsync(fileStream);
+                fileStream.Close();
+            }
             //Return json
             return Json(new UploadFileViewModel
             {
