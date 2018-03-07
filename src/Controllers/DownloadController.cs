@@ -52,7 +52,6 @@ namespace Aiursoft.OSS.Controllers
             var path = Startup.StoragePath + $"{_}Storage{_}{targetBucket.BucketName}{_}{targetFile.FileKey}.dat";
             try
             {
-                HttpContext.Response.Headers.Add("Content-Length", new FileInfo(path).Length.ToString());
                 if (StringOperation.IsImage(targetFile.RealFileName) && model.h > 0 && model.w > 0)
                 {
                     return await this.AiurFile(await _imageCompresser.Compress(path, targetFile.RealFileName, model.w, model.h), targetFile.RealFileName);
@@ -91,7 +90,6 @@ namespace Aiursoft.OSS.Controllers
             var path = Startup.StoragePath + $"{_}Storage{_}{bucket.BucketName}{_}{secret.File.FileKey}.dat";
             try
             {
-                HttpContext.Response.Headers.Add("Content-Length", new FileInfo(path).Length.ToString());
                 if (StringOperation.IsImage(secret.File.RealFileName) && model.h > 0 && model.w > 0)
                 {
                     return await this.AiurFile(await _imageCompresser.Compress(path, secret.File.RealFileName, model.w, model.h), secret.File.RealFileName);
