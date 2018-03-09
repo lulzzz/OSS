@@ -21,6 +21,14 @@ namespace Aiursoft.OSS.Services
         }
         public async Task GetReducedImage(string sourceImage, string saveTarget, int width, int height)
         {
+            var sourceFileInfo = new FileInfo(sourceImage);
+            if(File.Exists(saveTarget))
+            {
+                if(new FileInfo(saveTarget).LastWriteTime > sourceFileInfo.LastWriteTime)
+                {
+                    return;
+                }
+            }
             await Task.Run(new Action(() =>
             {
                 var image = Image.Load(sourceImage);
