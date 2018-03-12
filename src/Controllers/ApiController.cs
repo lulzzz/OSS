@@ -219,7 +219,7 @@ namespace Aiursoft.OSS.Controllers
         }
 
         [HttpPost]
-        [ContainsValidFile]
+        [ContainsValidFile("/")]
         public async Task<JsonResult> UploadFile(CommonAddressModel model)
         {
             var app = await ApiService.ValidateAccessTokenAsync(model.AccessToken);
@@ -231,10 +231,6 @@ namespace Aiursoft.OSS.Controllers
             }
             //try get the file from form
             var file = Request.Form.Files.First();
-            if (file == null)
-            {
-                return Protocal(ErrorType.InvalidInput, "Please upload your file!");
-            }
             var newFile = new OSSFile
             {
                 RealFileName = Path.GetFileName(file.FileName.Replace(" ", "")),
