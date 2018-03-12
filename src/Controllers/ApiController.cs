@@ -219,6 +219,7 @@ namespace Aiursoft.OSS.Controllers
         }
 
         [HttpPost]
+        [ContainsValidFile]
         public async Task<JsonResult> UploadFile(CommonAddressModel model)
         {
             var app = await ApiService.ValidateAccessTokenAsync(model.AccessToken);
