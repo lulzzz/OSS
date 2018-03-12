@@ -3,6 +3,9 @@ mono: none
 dotnet: 2.0.0
 dist: trusty
 install:
+  - cd ../
+  - git clone https://github.com/AiursoftWeb/Pylon.git
+  - cd ./Account
   - dotnet restore
 script:
   - dotnet build
