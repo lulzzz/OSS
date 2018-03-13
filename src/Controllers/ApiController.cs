@@ -227,7 +227,7 @@ namespace Aiursoft.OSS.Controllers
             var targetBucket = await _dbContext.Bucket.FindAsync(model.BucketId);
             if (targetBucket == null || targetBucket.BelongingAppId != app.AppId)
             {
-                return Protocal(ErrorType.Unauthorized,"The bucket you try to upload is not your app's bucket!");
+                return Protocal(ErrorType.Unauthorized, "The bucket you try to upload is not your app's bucket!");
             }
             //try get the file from form
             var file = Request.Form.Files.First();
@@ -236,6 +236,8 @@ namespace Aiursoft.OSS.Controllers
                 RealFileName = Path.GetFileName(file.FileName.Replace(" ", "")),
                 FileExtension = Path.GetExtension(file.FileName),
                 BucketId = targetBucket.BucketId,
+                AliveDays = model.AliveDays,
+                UploadTime = DateTime.Now
             };
             // Ensure there not exists file with the same file name.
             var exists = _dbContext.OSSFile.Exists(t => t.RealFileName == newFile.RealFileName && t.BucketId == newFile.BucketId);
@@ -303,12 +305,12 @@ namespace Aiursoft.OSS.Controllers
             var file = await _dbContext.OSSFile.FindAsync(model.FileKey);
             if (bucket == null || file == null)
             {
-                return Protocal(ErrorType.NotFound,  "We did not find that file in that bucket!");
+                return Protocal(ErrorType.NotFound, "We did not find that file in that bucket!");
             }
             //Security
             if (bucket.BelongingAppId != app.AppId)
             {
-                return Protocal(ErrorType.Unauthorized,  "The bucket you tried is not that app's bucket.");
+                return Protocal(ErrorType.Unauthorized, "The bucket you tried is not that app's bucket.");
             }
             if (file.BucketId != bucket.BucketId)
             {
@@ -316,7 +318,10 @@ namespace Aiursoft.OSS.Controllers
             }
             //Delete file in disk
             var path = Startup.StoragePath + $@"{_}Storage{_}{bucket.BucketName}{_}{file.FileKey}.dat";
-            System.IO.File.Delete(path);
+            if (System.IO.File.Exists(path))
+            {
+                System.IO.File.Delete(path);
+            }
             //Delete file in database
             _dbContext.OSSFile.Remove(file);
             await _dbContext.SaveChangesAsync();

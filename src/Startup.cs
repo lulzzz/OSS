@@ -17,6 +17,7 @@ using Aiursoft.Pylon.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.Hosting;
 
 namespace Aiursoft.OSS
 {
@@ -47,6 +48,7 @@ namespace Aiursoft.OSS
                 options.UseSqlServer(Configuration.GetConnectionString("DatabaseConnection")));
 
             services.AddMvc();
+            services.AddSingleton<IHostedService, TimedCleaner>();
             services.AddTransient<ImageCompresser>();
         }
 

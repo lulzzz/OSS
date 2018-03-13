@@ -11,9 +11,10 @@ using System;
 namespace Aiursoft.OSS.Migrations
 {
     [DbContext(typeof(OSSDbContext))]
-    partial class OSSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180313063057_CreateLiveTime")]
+    partial class CreateLiveTime
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
