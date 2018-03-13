@@ -220,7 +220,7 @@ namespace Aiursoft.OSS.Controllers
 
         [HttpPost]
         [ContainsValidFile("/")]
-        public async Task<JsonResult> UploadFile(CommonAddressModel model)
+        public async Task<JsonResult> UploadFile(UploadFileAddressModel model)
         {
             var app = await ApiService.ValidateAccessTokenAsync(model.AccessToken);
             //try find the target bucket
