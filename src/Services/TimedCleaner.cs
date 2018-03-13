@@ -1,5 +1,6 @@
 ﻿using Aiursoft.OSS.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -13,15 +14,18 @@ namespace Aiursoft.OSS.Services
 {
     public class TimedCleaner : IHostedService, IDisposable
     {
+        private IConfiguration Configuration { get; }
         private readonly ILogger _logger;
         private Timer _timer;
         private OSSDbContext _dbContext;
         private readonly char _ = Path.DirectorySeparatorChar;
 
         public TimedCleaner(
+            IConfiguration configuration,
             ILogger<TimedCleaner> logger,
             OSSDbContext dbContext)
         {
+            Configuration = configuration;
             _logger = logger;
             _dbContext = dbContext;
         }
@@ -40,12 +44,12 @@ namespace Aiursoft.OSS.Services
 
         private async Task AllClean()
         {
-            var outdatedFiles = (await _dbContext.OSSFile.ToListAsync())
+            var outdatedFiles = (await _dbContext.OSSFile.Include(t => t.BelongingBucket).ToListAsync())
                 .Where(t => t.UploadTime + new TimeSpan(t.AliveDays, 0, 0, 0) < DateTime.Now)
                 .ToList();
-            foreach(var file in outdatedFiles)
+            foreach (var file in outdatedFiles)
             {
-                var path = Startup.StoragePath + $@"{_}Storage{_}{file.BelongingBucket.BucketName}{_}{file.FileKey}.dat";
+                var path = $@"{Configuration["StoragePath"]}{_}Storage{_}{file.BelongingBucket.BucketName}{_}{file.FileKey}.dat";
                 if (File.Exists(path))
                 {
                     File.Delete(path);
