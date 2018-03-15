@@ -17,7 +17,7 @@ using Aiursoft.Pylon.Models.OSS.SecretAddressModels;
 namespace Aiursoft.OSS.Controllers
 {
     [AiurExceptionHandler]
-    public class SecretController : AiurController
+    public class SecretController : Controller
     {
         private readonly OSSDbContext _dbContext;
         public SecretController(

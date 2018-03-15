@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 namespace Aiursoft.OSS.Controllers
 {
     [ForceValidateModelState]
-    public class DownloadController : AiurController
+    public class DownloadController : Controller
     {
         private readonly char _ = Path.DirectorySeparatorChar;
         private readonly OSSDbContext _dbContext;
