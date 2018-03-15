@@ -56,6 +56,7 @@ namespace Aiursoft.OSS
             }
 
             app.UseStaticFiles();
+            app.UseLanguageSwitcher();
             app.UseMvcWithDefaultRoute();
         }
     }
