@@ -24,7 +24,6 @@ namespace Aiursoft.OSS.Controllers
 {
     [AiurExceptionHandler]
     [ForceValidateModelState]
-    [AiurRequireHttps]
     public class ApiController : AiurApiController
     {
         private readonly char _ = Path.DirectorySeparatorChar;

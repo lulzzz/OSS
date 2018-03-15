@@ -16,7 +16,6 @@ using Aiursoft.Pylon.Models.OSS.SecretAddressModels;
 
 namespace Aiursoft.OSS.Controllers
 {
-    [AiurRequireHttps]
     [AiurExceptionHandler]
     public class SecretController : AiurController
     {

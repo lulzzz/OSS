@@ -10,7 +10,6 @@ using Aiursoft.Pylon.Models;
 namespace Aiursoft.OSS.Controllers
 {
     [AiurExceptionHandler]
-    [AiurRequireHttps]
     public class HomeController : AiurController
     {
         public IActionResult Index()

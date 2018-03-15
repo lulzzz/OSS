@@ -17,7 +17,6 @@ using System.Threading.Tasks;
 
 namespace Aiursoft.OSS.Controllers
 {
-    [AiurRequireHttps]
     [ForceValidateModelState]
     public class DownloadController : AiurController
     {
