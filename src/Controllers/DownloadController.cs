@@ -1,18 +1,13 @@
 ﻿using Aiursoft.OSS.Data;
 using Aiursoft.OSS.Models.DownloadAddressModels;
 using Aiursoft.OSS.Services;
-using Aiursoft.Pylon;
 using Aiursoft.Pylon.Attributes;
-using Aiursoft.Pylon.Models;
 using Aiursoft.Pylon.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
-using Microsoft.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace Aiursoft.OSS.Controllers
@@ -27,8 +22,8 @@ namespace Aiursoft.OSS.Controllers
             OSSDbContext dbContext,
             ImageCompresser imageCompresser)
         {
-            this._dbContext = dbContext;
-            this._imageCompresser = imageCompresser;
+            _dbContext = dbContext;
+            _imageCompresser = imageCompresser;
         }
 
         [HttpGet]
