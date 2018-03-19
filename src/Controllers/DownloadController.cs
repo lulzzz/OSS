@@ -9,6 +9,13 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Aiursoft.Pylon;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.Hosting;
 
 namespace Aiursoft.OSS.Controllers
 {
@@ -18,12 +25,15 @@ namespace Aiursoft.OSS.Controllers
         private readonly char _ = Path.DirectorySeparatorChar;
         private readonly OSSDbContext _dbContext;
         private readonly ImageCompresser _imageCompresser;
+        private readonly IConfiguration _configuration;
         public DownloadController(
             OSSDbContext dbContext,
-            ImageCompresser imageCompresser)
+            ImageCompresser imageCompresser,
+            IConfiguration configuration)
         {
             _dbContext = dbContext;
             _imageCompresser = imageCompresser;
+            _configuration = configuration;
         }
 
         [HttpGet]
@@ -43,7 +53,7 @@ namespace Aiursoft.OSS.Controllers
             targetFile.DownloadTimes++;
             await _dbContext.SaveChangesAsync();
 
-            var path = Startup.StoragePath + $"{_}Storage{_}{targetBucket.BucketName}{_}{targetFile.FileKey}.dat";
+            var path = _configuration["StoragePath"] + $"{_}Storage{_}{targetBucket.BucketName}{_}{targetFile.FileKey}.dat";
             try
             {
                 if (StringOperation.IsImage(targetFile.RealFileName) && model.h > 0 && model.w > 0)
@@ -81,7 +91,7 @@ namespace Aiursoft.OSS.Controllers
                 .Bucket
                 .SingleOrDefaultAsync(t => t.BucketId == secret.File.BucketId);
 
-            var path = Startup.StoragePath + $"{_}Storage{_}{bucket.BucketName}{_}{secret.File.FileKey}.dat";
+            var path = _configuration["StoragePath"] + $"{_}Storage{_}{bucket.BucketName}{_}{secret.File.FileKey}.dat";
             try
             {
                 if (StringOperation.IsImage(secret.File.RealFileName) && model.h > 0 && model.w > 0)

@@ -19,6 +19,7 @@ using Aiursoft.Pylon.Attributes;
 using Aiursoft.Pylon.Models.OSS.ApiAddressModels;
 using Aiursoft.Pylon;
 using Aiursoft.OSS.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace Aiursoft.OSS.Controllers
 {
@@ -29,12 +30,15 @@ namespace Aiursoft.OSS.Controllers
         private readonly char _ = Path.DirectorySeparatorChar;
         private readonly OSSDbContext _dbContext;
         private readonly ImageCompresser _imageCompresser;
+        private readonly IConfiguration _configuration;
         public ApiController(
             OSSDbContext dbContext,
-            ImageCompresser imageCompresser)
+            ImageCompresser imageCompresser,
+            IConfiguration configuration)
         {
-            this._dbContext = dbContext;
-            this._imageCompresser = imageCompresser;
+            _dbContext = dbContext;
+            _imageCompresser = imageCompresser;
+            _configuration = configuration;
         }
 
         [HttpPost]
@@ -121,7 +125,7 @@ namespace Aiursoft.OSS.Controllers
             appLocal.MyBuckets.Add(newBucket);
             await _dbContext.SaveChangesAsync();
             //Create an empty folder
-            string DirectoryPath = Startup.StoragePath + $@"{_}Storage{_}{newBucket.BucketName}{_}";
+            string DirectoryPath = _configuration["StoragePath"] + $@"{_}Storage{_}{newBucket.BucketName}{_}";
             if (Directory.Exists(DirectoryPath) == false)
             {
                 Directory.CreateDirectory(DirectoryPath);
@@ -154,8 +158,8 @@ namespace Aiursoft.OSS.Controllers
             {
                 return this.Protocal(ErrorType.Unauthorized, "This is not your bucket!");
             }
-            var oldpath = Startup.StoragePath + $@"{_}Storage{_}{target.BucketName}";
-            var newpath = Startup.StoragePath + $@"{_}Storage{_}{model.NewBucketName}";
+            var oldpath = _configuration["StoragePath"] + $@"{_}Storage{_}{target.BucketName}";
+            var newpath = _configuration["StoragePath"] + $@"{_}Storage{_}{model.NewBucketName}";
             if (oldpath != newpath)
             {
                 new DirectoryInfo(oldpath).MoveTo(newpath);
@@ -205,7 +209,7 @@ namespace Aiursoft.OSS.Controllers
                 .Include(t => t.BelongingBucket)
                 .SingleOrDefaultAsync(t => t.FileKey == model.FileKey);
 
-            var path = Startup.StoragePath + $@"{_}Storage{_}{file.BelongingBucket.BucketName}{_}{file.FileKey}.dat";
+            var path = _configuration["StoragePath"] + $@"{_}Storage{_}{file.BelongingBucket.BucketName}{_}{file.FileKey}.dat";
             file.JFileSize = new FileInfo(path).Length;
 
             var viewModel = new ViewOneFileViewModel
@@ -248,7 +252,7 @@ namespace Aiursoft.OSS.Controllers
             _dbContext.OSSFile.Add(newFile);
             await _dbContext.SaveChangesAsync();
             //Try saving file.
-            string DirectoryPath = Startup.StoragePath + $"{_}Storage{_}{targetBucket.BucketName}{_}";
+            string DirectoryPath = _configuration["StoragePath"] + $"{_}Storage{_}{targetBucket.BucketName}{_}";
             if (Directory.Exists(DirectoryPath) == false)
             {
                 Directory.CreateDirectory(DirectoryPath);
@@ -282,7 +286,7 @@ namespace Aiursoft.OSS.Controllers
             var allFiles = _dbContext.OSSFile.Include(t => t.BelongingBucket).Where(t => t.BucketId == bucket.BucketId).Take(200);
             foreach (var file in allFiles)
             {
-                var path = Startup.StoragePath + $@"{_}Storage{_}{file.BelongingBucket.BucketName}{_}{file.FileKey}.dat";
+                var path = _configuration["StoragePath"] + $@"{_}Storage{_}{file.BelongingBucket.BucketName}{_}{file.FileKey}.dat";
                 file.JFileSize = new FileInfo(path).Length;
             }
             var viewModel = new ViewAllFilesViewModel
@@ -316,7 +320,7 @@ namespace Aiursoft.OSS.Controllers
                 return this.Protocal(ErrorType.Unauthorized, "The file and the bucket are both found but it is not in that bucket.");
             }
             //Delete file in disk
-            var path = Startup.StoragePath + $@"{_}Storage{_}{bucket.BucketName}{_}{file.FileKey}.dat";
+            var path = _configuration["StoragePath"] + $@"{_}Storage{_}{bucket.BucketName}{_}{file.FileKey}.dat";
             if (System.IO.File.Exists(path))
             {
                 System.IO.File.Delete(path);

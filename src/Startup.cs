@@ -15,7 +15,6 @@ namespace Aiursoft.OSS
     public class Startup
     {
         public IConfiguration Configuration { get; }
-        public static string StoragePath { get; set; }
 
         public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
@@ -39,11 +38,6 @@ namespace Aiursoft.OSS
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, OSSDbContext dbContext)
         {
-            StoragePath = Configuration[nameof(StoragePath)];
-            if(string.IsNullOrWhiteSpace(StoragePath))
-            {
-                throw new InvalidOperationException("Did not find a valid storage path!");
-            }
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
