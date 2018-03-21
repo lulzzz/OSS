@@ -222,7 +222,7 @@ namespace Aiursoft.OSS.Controllers
         }
 
         [HttpPost]
-        [ContainsValidFile("/")]
+        [ContainsValidFile]
         public async Task<JsonResult> UploadFile(UploadFileAddressModel model)
         {
             var app = await ApiService.ValidateAccessTokenAsync(model.AccessToken);
